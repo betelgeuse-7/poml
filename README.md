@@ -3,7 +3,7 @@
 A markup language that has a one-to-one relationship with HTML.
 
 ```lisp
-    (p text: Hello)
+    (p "Hello")
 ```
 is
 ```html
@@ -12,24 +12,24 @@ is
 ---
 
 ```lisp
-    (tag-name [attr:attr-val;] [child-elements])
+    (tag-name [attr:attr-val] [child-elements])
 ```
 
 ##### Examples
-```sml
+```lisp
 (div 
-    (* this is a comment)
-    (h3 text: A Cat Picture;)
-    (a href: https://google.com; text: Google;)
-    (div class: cat-div container;
-        (img id: catphoto; src: https://example.com/img/cat.jpg;)
+    ; this is a comment
+    (h3 "A \"Cat\" Picture")
+    (a href: https://google.com "Google")
+    (div class: cat-div container
+        (img id: catphoto src: https://example.com/img/cat.jpg)
     )
-    (button onclick: doSomething(); text: Click Me;)
+    (button onclick: doSomething() "Click Me")
 )
 ```
 ```html
 <div>
-    <h3>A Cat Picture</h3>
+    <h3>A "Cat" Picture</h3>
     <a href="https://google.com">Google</a>
     <div class="cat-div container">
         <img id="catphoto" src="https://example.com/img/cat.jpg">
