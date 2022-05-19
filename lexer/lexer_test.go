@@ -113,10 +113,6 @@ func TestLexerLex(t *testing.T) {
 	got := tokens{}
 	for {
 		tok, _ := l.Lex()
-		/*
-			if tok.Tok == token.WHITESPACE {
-				continue
-			}*/
 		got = append(got, tok)
 		if tok.Tok == token.EOF {
 			break

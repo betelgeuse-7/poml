@@ -18,12 +18,7 @@ const (
 	ILLEGAL    TokenType = "ILLEGAL"
 	WHITESPACE TokenType = "WHITESPACE"
 
-	LPAREN TokenType = "LPAREN"
 	RPAREN TokenType = "RPAREN"
-	COLON  TokenType = "COLON"
-	SCOLON TokenType = "SCOLON"
-
-	IDENT TokenType = "IDENT"
 
 	TAG     TokenType = "TAG"
 	ATTR    TokenType = "ATTR"
