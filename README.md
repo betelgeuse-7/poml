@@ -12,7 +12,7 @@ is
 ---
 
 ```lisp
-    (tag-name [:attr "attr-val"] [child-elements])
+    (tag-name ["<text>"] [:attr "attr-val"] [child-elements])
 ```
 
 ##### Examples
