@@ -7,26 +7,116 @@ import (
 	"github.com/betelgeuse-7/poml/token"
 )
 
+var (
+	TAG = func(lit string) token.Token {
+		return token.Token{
+			Tok: token.TAG,
+			Lit: lit,
+		}
+	}
+	WS = func(lit string) token.Token {
+		return token.Token{
+			Tok: token.WHITESPACE,
+			Lit: lit,
+		}
+	}
+	COMMENT = func(lit string) token.Token {
+		return token.Token{
+			Tok: token.COMMENT,
+			Lit: lit,
+		}
+	}
+	TEXT = func(lit string) token.Token {
+		return token.Token{
+			Tok: token.TEXT,
+			Lit: lit,
+		}
+	}
+	ATTR = func(lit string) token.Token {
+		return token.Token{
+			Tok: token.ATTR,
+			Lit: lit,
+		}
+	}
+	RPAREN = func() token.Token {
+		return token.Token{
+			Tok: token.RPAREN,
+			Lit: ")",
+		}
+	}
+)
+
 func TestLexerLex(t *testing.T) {
-	input := `(p text: yes;)   g `
+	input := `(div 
+		; this is a comment
+		(h3 "A \"Cat\" Picture")
+		(a :href "https://google.com" "Google")
+		(div :class "cat-div container"
+			(img :id "catphoto" :src "https://example.com/img/cat.jpg")
+		)
+		(button :onclick "doSomething()" "Click Me" :style "background-color: blue; border-radius: 3px;")
+	)`
 	want := tokens{
-		{Tok: token.LPAREN, Lit: "("},
-		{Tok: token.IDENT, Lit: "p"},
-		{Tok: token.WHITESPACE, Lit: " "},
-		{Tok: token.IDENT, Lit: "text"},
-		{Tok: token.COLON, Lit: ":"},
-		{Tok: token.WHITESPACE, Lit: " "},
-		{Tok: token.IDENT, Lit: "yes"},
-		{Tok: token.SCOLON, Lit: ";"},
-		{Tok: token.RPAREN, Lit: ")"},
-		{Tok: token.WHITESPACE, Lit: "   "},
-		{Tok: token.IDENT, Lit: "g"},
-		{Tok: token.WHITESPACE, Lit: " "},
+		TAG("div"),
+		WS(" \n		"),
+		COMMENT(" this is a comment"),
+		WS("\n		"),
+		TAG("h3"),
+		WS(" "),
+		TEXT("\"A \\\"Cat\\\" Picture\""),
+		RPAREN(),
+		WS("\n		"),
+		TAG("a"),
+		WS(" "),
+		ATTR(":href"),
+		WS(" "),
+		TEXT("\"https://google.com\""),
+		WS(" "),
+		TEXT("\"Google\""),
+		RPAREN(),
+		WS("\n		"),
+		TAG("div"),
+		WS(" "),
+		ATTR(":class"),
+		WS(" "),
+		TEXT("\"cat-div container\""),
+		WS("\n			"),
+		TAG("img"),
+		WS(" "),
+		ATTR(":id"),
+		WS(" "),
+		TEXT("\"catphoto\""),
+		WS(" "),
+		ATTR(":src"),
+		WS(" "),
+		TEXT("\"https://example.com/img/cat.jpg\""),
+		RPAREN(),
+		WS("\n		"),
+		RPAREN(),
+		WS("\n		"),
+		TAG("button"),
+		WS(" "),
+		ATTR(":onclick"),
+		WS(" "),
+		TEXT("\"doSomething()\""),
+		WS(" "),
+		TEXT("\"Click Me\""),
+		WS(" "),
+		ATTR(":style"),
+		WS(" "),
+		TEXT("\"background-color: blue; border-radius: 3px;\""),
+		RPAREN(),
+		WS("\n	"),
+		RPAREN(),
 	}
 	l := New(input)
 	got := tokens{}
 	for {
-		tok := l.Lex()
+		tok, _ := l.Lex()
+		/*
+			if tok.Tok == token.WHITESPACE {
+				continue
+			}*/
 		got = append(got, tok)
 		if tok.Tok == token.EOF {
 			break
@@ -46,7 +136,7 @@ func TestLexerLexWhitespace(t *testing.T) {
 	input := "    "
 	want := token.Token{Tok: token.WHITESPACE, Lit: "    "}
 	l := New(input)
-	got := l.lexWhitespace()
+	got, _ := l.lexWhitespace()
 	fmt.Println(l.String())
 	if got.Tok != want.Tok || got.Lit != want.Lit {
 		t.Errorf("expected %s (length: %d), but got %s (length: %d)\n", want.String(), len(want.Lit), got.String(), len(got.Lit))

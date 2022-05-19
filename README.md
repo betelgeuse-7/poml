@@ -12,7 +12,7 @@ is
 ---
 
 ```lisp
-    (tag-name [attr:attr-val] [child-elements])
+    (tag-name [:attr "attr-val"] [child-elements])
 ```
 
 ##### Examples
@@ -20,11 +20,11 @@ is
 (div 
     ; this is a comment
     (h3 "A \"Cat\" Picture")
-    (a href: https://google.com "Google")
-    (div class: cat-div container
-        (img id: catphoto src: https://example.com/img/cat.jpg)
+    (a :href "https://google.com" "Google")
+    (div :class "cat-div container"
+        (img :id "catphoto" :src "https://example.com/img/cat.jpg")
     )
-    (button onclick: doSomething() "Click Me")
+    (button :onclick "doSomething()" "Click Me" :style "background-color: blue; border-radius: 3px;")
 )
 ```
 ```html
@@ -34,6 +34,6 @@ is
     <div class="cat-div container">
         <img id="catphoto" src="https://example.com/img/cat.jpg">
     </div>
-    <button onclick="doSomething()">Click Me</button>
+    <button onclick="doSomething()" style="background-color: blue; border-radius: 3px;">Click Me</button>
 </div>
 ```

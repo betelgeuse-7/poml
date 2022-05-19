@@ -25,12 +25,8 @@ const (
 
 	IDENT TokenType = "IDENT"
 
-	// The lexer doesn't produce these
 	TAG     TokenType = "TAG"
 	ATTR    TokenType = "ATTR"
 	COMMENT TokenType = "COMMENT"
-	// the string between 'text:' and ';' in elements
-	TEXT TokenType = "TEXT"
-	// e.g. 'doSomething()' in '(button onclick: doSomething(); text: Click Me;)'
-	FUNCTIONCALL TokenType = "FUNCTIONCALL"
+	TEXT    TokenType = "TEXT"
 )
