@@ -9,11 +9,7 @@ import (
 type tokens = []token.Token
 
 const EOF_RUNE = rune(0)
-
-// character position info
-type CharPos struct {
-	x, y uint
-}
+const EOF_LIT = "<<<EOF>>>"
 
 type Lexer struct {
 	input      string
@@ -37,6 +33,10 @@ func New(input string) *Lexer {
 	}
 	return l
 }
+
+func (l *Lexer) X() uint           { return l.x }
+func (l *Lexer) Y() uint           { return l.y }
+func (l *Lexer) NextChIsEOF() bool { return l.nextch == EOF_RUNE }
 
 // for debugging purposes
 func (l *Lexer) String() string {
@@ -66,12 +66,12 @@ func (l *Lexer) advance() {
 	l.nextch = rune(l.input[l.nextX])
 }
 
-func (l *Lexer) Lex() (token.Token, CharPos) {
+func (l *Lexer) Lex() token.Token {
 	if l.ch == EOF_RUNE {
 		return token.Token{
 			Tok: token.EOF,
-			Lit: "<<<EOF>>>",
-		}, l.charPos()
+			Lit: EOF_LIT,
+		}
 	}
 	if isWhitespace(l.ch) {
 		return l.lexWhitespace()
@@ -84,7 +84,7 @@ func (l *Lexer) Lex() (token.Token, CharPos) {
 		return token.Token{
 			Tok: token.RPAREN,
 			Lit: ")",
-		}, l.charPos()
+		}
 	case '"':
 		return l.lexText()
 	case ':':
@@ -97,10 +97,10 @@ func (l *Lexer) Lex() (token.Token, CharPos) {
 	return token.Token{
 		Tok: token.ILLEGAL,
 		Lit: string(l.ch),
-	}, l.charPos()
+	}
 }
 
-func (l *Lexer) lexWhitespace() (token.Token, CharPos) {
+func (l *Lexer) lexWhitespace() token.Token {
 	start := l.x
 	end := l.x
 	for isWhitespace(l.ch) {
@@ -114,10 +114,10 @@ func (l *Lexer) lexWhitespace() (token.Token, CharPos) {
 	return token.Token{
 		Tok: token.WHITESPACE,
 		Lit: lit,
-	}, l.charPos()
+	}
 }
 
-func (l *Lexer) lexComment() (token.Token, CharPos) {
+func (l *Lexer) lexComment() token.Token {
 	l.advance()
 	start := l.x
 	for l.ch != '\n' {
@@ -130,10 +130,10 @@ func (l *Lexer) lexComment() (token.Token, CharPos) {
 	return token.Token{
 		Tok: token.COMMENT,
 		Lit: lit,
-	}, l.charPos()
+	}
 }
 
-func (l *Lexer) lexTag() (token.Token, CharPos) {
+func (l *Lexer) lexTag() token.Token {
 	l.advance()
 	start := l.x
 	for !isWhitespace(l.ch) {
@@ -146,10 +146,10 @@ func (l *Lexer) lexTag() (token.Token, CharPos) {
 	return token.Token{
 		Tok: token.TAG,
 		Lit: lit,
-	}, l.charPos()
+	}
 }
 
-func (l *Lexer) lexText() (token.Token, CharPos) {
+func (l *Lexer) lexText() token.Token {
 	res := ""
 	res += string(l.ch)
 	for {
@@ -178,10 +178,10 @@ func (l *Lexer) lexText() (token.Token, CharPos) {
 	return token.Token{
 		Tok: token.TEXT,
 		Lit: res,
-	}, l.charPos()
+	}
 }
 
-func (l *Lexer) lexAttr() (token.Token, CharPos) {
+func (l *Lexer) lexAttr() token.Token {
 	start := l.x
 	for !isWhitespace(l.ch) {
 		l.advance()
@@ -193,12 +193,5 @@ func (l *Lexer) lexAttr() (token.Token, CharPos) {
 	return token.Token{
 		Tok: token.ATTR,
 		Lit: lit,
-	}, l.charPos()
-}
-
-func (l *Lexer) charPos() CharPos {
-	return CharPos{
-		x: l.x,
-		y: l.y,
 	}
 }

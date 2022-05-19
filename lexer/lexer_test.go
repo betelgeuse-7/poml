@@ -112,7 +112,7 @@ func TestLexerLex(t *testing.T) {
 	l := New(input)
 	got := tokens{}
 	for {
-		tok, _ := l.Lex()
+		tok := l.Lex()
 		got = append(got, tok)
 		if tok.Tok == token.EOF {
 			break
@@ -132,7 +132,7 @@ func TestLexerLexWhitespace(t *testing.T) {
 	input := "    "
 	want := token.Token{Tok: token.WHITESPACE, Lit: "    "}
 	l := New(input)
-	got, _ := l.lexWhitespace()
+	got := l.lexWhitespace()
 	fmt.Println(l.String())
 	if got.Tok != want.Tok || got.Lit != want.Lit {
 		t.Errorf("expected %s (length: %d), but got %s (length: %d)\n", want.String(), len(want.Lit), got.String(), len(got.Lit))
