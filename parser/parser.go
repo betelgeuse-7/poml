@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/betelgeuse-7/poml/lexer"
 	"github.com/betelgeuse-7/poml/token"
 )
@@ -57,44 +55,67 @@ func (p *Parser) Errors() []string {
 
 // return next HTML element
 func (p *Parser) Next() *Node {
-	n := &Node{
-		Tag: p.tok.Lit,
+	n := &Node{}
+	if p.tok.Tok == token.EOF {
+		return n
 	}
-	for {
-		if p.tok.Tok == token.EOF || p.tok.Tok == token.RPAREN {
-			fmt.Println(">>>>>>>>>>>>>>>>> " + p.tok.Tok)
-			return n
-		}
-		// TODO this is buggy
-		if p.tok.Tok == token.ILLEGAL {
-			panic(fmt.Sprintf("illegal token at line: %d  row: %d\n", p.l.X(), p.l.Y()))
-		}
-		if p.tok.Tok == token.TEXT {
-			n.HasText = true
-			n.Text = p.tok.Lit
-		}
-		if p.tok.Tok == token.ATTR {
-			attr := Attr{
-				Key: p.tok.Lit,
-			}
-			p.advance()
-			if p.tok.Tok == token.WHITESPACE {
-				p.advance()
-				if p.tok.Tok == token.TEXT {
-					attr.Val = p.tok.Lit
-				}
-			}
-			n.Attrs = append(n.Attrs, attr)
-		}
-		/*
-			if p.tok.Tok == token.TAG {
-				n.Children = append(n.Children, p.Next())
-			}*/
-		p.advance()
+	if p.tok.Tok == token.TAG {
+		n.Tag = p.tok.Lit
 	}
+	for p.tok.Tok == token.ATTR {
+		attr := Attr{Key: p.tok.Lit}
+		attr.Val = p.parseAttrVal()
+		n.Attrs = append(n.Attrs, attr)
+	}
+	if p.tok.Tok == token.TEXT {
+		n.HasText = true
+		n.Text = p.parseTextContent()
+	}
+	/*
+		p.parseNodeChildren(n)
+	*/
+	p.advance()
+	return n
+}
+
+func (p *Parser) parseAttrVal() string {
+	p.advance()
+	if cur := p.tok.Tok; cur == token.TEXT {
+		return p.tok.Lit
+	}
+	return ""
+}
+
+func (p *Parser) parseTextContent() string {
+	p.advance()
+	if cur := p.tok.Tok; cur == token.TEXT {
+		return p.tok.Lit
+	}
+	return ""
 }
 
 /*
-// next token must match t, otherwise append an error to p.errors
-func (p *Parser) matchNext(t token.TokenType) {}
+func (p *Parser) parseNodeChildren(n *Node) {
+	p.advance()
+	if cur := p.tok; cur.Tok == token.TAG {
+		nn := &Node{
+			Tag: cur.Lit,
+		}
+		p.advance()
+		switch cur.Tok {
+		case token.TEXT:
+			nn.HasText = true
+			nn.Text = p.parseTextContent()
+		case token.ATTR:
+			for p.tok.Tok == token.ATTR {
+				attr := Attr{Key: p.tok.Lit}
+				attr.Val = p.parseAttrVal()
+				nn.Attrs = append(nn.Attrs, attr)
+			}
+		case token.TAG:
+			p.parseNodeChildren(nn)
+		}
+		n.Children = append(n.Children, nn)
+	}
+}
 */
